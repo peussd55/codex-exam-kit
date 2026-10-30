@@ -1,8 +1,8 @@
 # 180분 플레이북
 
-`cat ~/kit/playbook.md` — 한 화면 지도. 세부 문구는 prompts.md.
+`cat /tmp/kit/playbook.md` — 한 화면 지도. 세부 문구는 prompts.md.
 
-## 터미널
+## 터미널 (모두 작업 폴더에서 띄운다 — 예: `cd ~/uploads`)
 | 터미널 | 역할 | 띄우는 법 |
 |---|---|---|
 | T1 메인 Codex | 쓰기 (유일한 작성자) | `codex -c sandbox_workspace_write.network_access=true` (없으면 Codex 안에서 서버 테스트가 늘 실패) |
@@ -13,7 +13,7 @@
 ## 흐름
 | 경과 | 메인 | 보조 | 나 |
 |---|---|---|---|
-| 0–5분 | — | — | 감독 절차 → 키트 설치 → 첫 커밋 → `git tag r0` (시작 상태) |
+| 0–5분 | — | — | 감독 절차 → 시작 직후 확인(아래) → 키트 설치 → 첫 커밋(`git add .`) → `git tag r0` (시작 상태) |
 | 5–20분 | 세션1: 요구사항 체크리스트 (prompts 1) | — | README 정독, 담당자 질문 (prompts 7) |
 | 20–35분 | 세션1: PLAN.md 설계 (prompts 2) → 커밋 → `git tag r1` | — | 답 반영, 설계 확인 |
 | 35–40분 | 대기 | **리뷰①** 계획 리뷰 (prompts 5) | 반영·거절 → Decision Log |
@@ -45,18 +45,19 @@
 `/status` 남은 컨텍스트 · `/model` 모델·추론 수준 · `/permissions` 권한 · `/new` 새 세션 · `/review` 리뷰 · `/side` 곁가지 질문 · `!명령` 셸.
 버전마다 다를 수 있다(`/side`는 특히 확인 필요). 처음에 `/` 목록을 본다. Codex 업데이트 권유가 떠도 업데이트하지 않는다.
 
-## 사전 체험 때 키트로 확인할 것
-- clone이 되는가(github.com 접속). 안 되면 README의 tar.gz 대안
-- `bash ~/kit/install.sh` → `./scripts/check.sh` → `./scripts/status.sh`가 도는가
-- 메인을 T1 명령으로 띄우고 "이어서"만 쳤을 때 status.sh를 실제로 실행하는가. 안 따르면 `!./scripts/status.sh`
-- 메인에게 `./scripts/check.sh`를 시키면 T3 셸과 같은 결과인가. 다르면 check.sh가 찍는 "환경" 줄을 본다
-- Codex가 git commit을 할 때 승인 요청이 뜨는가. 막히면 커밋은 T3 셸에서 내가 한다
-- `codex --sandbox read-only --ask-for-approval never`가 뜨고, 쓰기를 시키면 승인을 묻지 않고 못 한다고 하는가
+## 시작 직후 확인 (0–5분)
+1. `cat ~/.codex/AGENTS.md` — 플랫폼 지침을 **읽기만**. 작업 폴더·금지 사항이 있으면 그것을 따른다
+2. 작업 폴더 = 과제 README가 정한 곳, 없으면 Codex `/status`의 Directory(체험 땐 `~/uploads`)
+3. `git clone -b exam-1031 https://github.com/<계정>/codex-exam-kit /tmp/kit` — 작업 저장소 바깥. 막히면 README의 tar.gz 대안
+4. `cd <작업 폴더> && bash /tmp/kit/install.sh` → `./scripts/check.sh` → `git status -s -uall .`에 키트 파일만 보이면 `git add . && git commit -m "chore: 작업 키트 추가" && git tag r0`
+5. 메인을 T1 명령으로 띄우고 `/status`의 Agents.md에 `~/.codex/AGENTS.md`와 작업 폴더 AGENTS.md가 **둘 다** 보이는가 → "이어서"에 status.sh를 실행하는가(안 따르면 `!./scripts/status.sh`)
+6. 메인이 돌린 check가 T3 셸과 같은가(다르면 "환경" 줄). Codex 커밋에 승인 창이 뜨는가(막히면 T3에서 내가 커밋)
 
 ## 하지 않는 것
 - `/init` — AGENTS.md를 새로 만들어 키트 규칙을 덮을 수 있다
 - `/plan`(계획 모드) — 끝 화면 "Implement this plan?"에서 Enter = 바로 전부 구현. 계획은 일반 모드에서 PLAN.md에 쓴다(prompts 2)
 - `/new`에서 "Create new Git worktree" — 다른 폴더로 갈라진다. 1번 current worktree를 고른다
+- `git add -A` — 저장소 루트가 홈이면 ~/.codex(로그인 정보)까지 담긴다. 작업 폴더에서 `git add .`
 - `git remote add`, push, 기존 `.git` 삭제·재초기화, rebase·amend·reset --hard
 - 결과물을 외부 자료로 통째로 바꾸기
 - 테스트를 지우거나 기대값을 바꿔서 통과시키기 (필요하면 이유를 남기고 따로 커밋)

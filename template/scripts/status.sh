@@ -29,7 +29,7 @@ if [ -n "$found" ]; then echo "$found" | sed 's/^/  /'; else echo "  (없음)"; 
 
 echo "== git"
 if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-  git status -sb | head -15
+  git status -sb -- . | head -15
   echo "  -- 최근 커밋"
   if git rev-parse --verify -q HEAD >/dev/null; then
     git log --oneline -5 | sed 's/^/  /'

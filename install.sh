@@ -7,9 +7,9 @@
 # - ~/.codex 등 Codex 설정은 건드리지 않는다
 #
 # 사용 (bash로 실행):
-#   git clone --depth 1 --branch exam-1031 https://github.com/<계정>/codex-exam-kit ~/kit
-#   cd <작업 폴더>
-#   bash ~/kit/install.sh
+#   git clone -b exam-1031 https://github.com/<계정>/codex-exam-kit /tmp/kit   ← 작업 저장소 바깥
+#   cd <작업 폴더>                                                             ← 예: ~/uploads
+#   bash /tmp/kit/install.sh
 set -eo pipefail
 
 KIT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -18,6 +18,14 @@ DEST="$(pwd)"
 
 if [ "$DEST" = "$KIT_DIR" ] || [ "${DEST#"$KIT_DIR"/}" != "$DEST" ]; then
   echo "키트 폴더 안에서 실행했어요. 작업 폴더로 이동한 뒤 다시 실행하세요: cd <작업 폴더> && bash $KIT_DIR/install.sh"
+  exit 1
+fi
+
+# 키트가 작업 저장소 안에 있으면 제출물에 키트 저장소가 섞인다 (저장소 루트가 홈이면 ~/kit도 안쪽이다)
+TOP="$(git -C "$DEST" rev-parse --show-toplevel 2>/dev/null || true)"
+if [ -n "$TOP" ] && { [ "$KIT_DIR" = "$TOP" ] || [ "${KIT_DIR#"$TOP"/}" != "$KIT_DIR" ]; }; then
+  echo "키트가 작업 저장소($TOP) 안에 있어요. 이대로면 제출물에 키트 저장소가 섞입니다."
+  echo "저장소 바깥에 받은 뒤 다시 실행하세요: git clone -b exam-1031 <키트 주소> /tmp/kit && bash /tmp/kit/install.sh"
   exit 1
 fi
 
@@ -74,12 +82,16 @@ echo "복사 ${copied}개 · 덧붙임 ${merged}개 · 건너뜀 ${skipped}개"
 if git -C "$DEST" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   echo "git 저장소: 있음 ($(git -C "$DEST" log --oneline -1 2>/dev/null || echo '커밋 없음'))"
   echo "  키트 파일을 커밋하고 시작 상태에 태그를 다세요:"
-  echo "  git add -A && git commit -m \"chore: 작업 키트 추가\" && git tag r0"
+  echo "  git status -s -uall .   ← 키트 파일만 보이는지 확인"
+  echo "  git add . && git commit -m \"chore: 작업 키트 추가\" && git tag r0"
 else
   echo "git 저장소: 없음 → 아래를 실행하세요"
   echo "  git init"
   echo "  git config user.name \"이름\"; git config user.email \"메일\""
-  echo "  git add -A && git commit -m \"init: 과제 시작 상태 + 작업 키트\" && git tag r0"
+  echo "  git add . && git commit -m \"init: 과제 시작 상태 + 작업 키트\" && git tag r0"
+fi
+if [ -n "$TOP" ] && [ "$TOP" = "$HOME" ]; then
+  echo "주의: 저장소 루트가 홈($HOME)이에요. git add -A는 ~/.codex(로그인 정보) 같은 홈 파일까지 담습니다 → 작업 폴더에서 git add . 만 쓰세요."
 fi
 if [ -z "$(git -C "$DEST" config user.name 2>/dev/null)" ]; then
   echo "주의: git user.name이 비어 있어요. 커밋 전에 설정하세요."

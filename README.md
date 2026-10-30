@@ -23,17 +23,18 @@
 ## 사용
 
 ```bash
-git clone --depth 1 --branch exam-1031 https://github.com/<계정>/codex-exam-kit ~/kit
-cd <작업 폴더>
-bash ~/kit/install.sh
-# 안내대로 커밋하고 시작 상태에 태그
-git add -A && git commit -m "chore: 작업 키트 추가" && git tag r0
+git clone -b exam-1031 https://github.com/<계정>/codex-exam-kit /tmp/kit
+cd <작업 폴더>                 # 예: ~/uploads (Codex /status의 Directory)
+bash /tmp/kit/install.sh
+git status -s -uall .          # 키트 파일만 보이는지 확인
+git add . && git commit -m "chore: 작업 키트 추가" && git tag r0
 ```
 
 - 태그: 시험에 쓰는 판은 `exam-1031` 태그로 고정합니다. 이후 이 태그는 옮기지 않습니다.
-- 키트는 작업 폴더 **바깥**에 받고 필요한 파일만 복사합니다. 작업 폴더의 git 이력에 키트 저장소가 섞이지 않게 하려는 것입니다. 작업 폴더가 홈(`~`) 자체라면 `~/kit` 대신 `/tmp/kit`에 받습니다.
+- 키트는 작업 **저장소 바깥**(`/tmp/kit`)에 받고 필요한 파일만 복사합니다. 제출물에 키트 저장소가 섞이지 않게 하려는 것입니다. 홈 자체가 저장소인 환경에서는 `~/kit`도 저장소 안이므로, install.sh는 키트가 작업 저장소 안에 있으면 설치를 거부합니다.
+- 스테이징은 작업 폴더 안만(`git add .`). 저장소 루트가 홈이면 `git add -A`가 `~/.codex`(로그인 정보) 같은 홈 파일까지 담습니다.
 - git clone이 막히면 압축 파일로 받습니다:
-  `mkdir -p ~/kit && curl -fsSL https://github.com/<계정>/codex-exam-kit/archive/refs/tags/exam-1031.tar.gz | tar xz -C ~/kit --strip-components=1`
+  `mkdir -p /tmp/kit && curl -fsSL https://github.com/<계정>/codex-exam-kit/archive/refs/tags/exam-1031.tar.gz | tar xz -C /tmp/kit --strip-components=1`
 - `install.sh`는 없는 파일만 복사합니다. 이미 있는 AGENTS.md에는 키트 규칙을 구분선 아래에 덧붙이고(과제 지침이 우선), 이미 있는 .gitignore에는 빠진 줄만 덧붙입니다. 그 밖의 기존 파일은 건드리지 않습니다. git 커밋, 원격 저장소, Codex 설정(`~/.codex`)도 건드리지 않습니다.
 
 ## 작업 방식 요약
