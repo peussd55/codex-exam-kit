@@ -33,6 +33,21 @@ with_timeout() {
   fi
 }
 
+# 0) 환경: Codex 샌드박스가 네트워크를 막으면 127.0.0.1 포트도 못 연다 → 서버를 띄우는 테스트가 코드와 무관하게 실패
+port_blocked() {
+  if command -v python3 >/dev/null 2>&1; then
+    ! python3 -c 'import socket; s = socket.socket(); s.bind(("127.0.0.1", 0)); s.listen()' 2>/dev/null
+  elif command -v node >/dev/null 2>&1; then
+    ! node -e 'require("net").createServer().listen(0, "127.0.0.1", () => process.exit(0)).on("error", () => process.exit(1))' 2>/dev/null
+  else
+    return 1
+  fi
+}
+if port_blocked; then
+  echo "── 환경: 127.0.0.1 포트를 열 수 없음(Codex 샌드박스 네트워크 차단). 서버를 띄우는 테스트는 코드와 무관하게 실패한다 — 코드를 고치지 말고 보고할 것."
+  echo "   메인 Codex는 codex -c sandbox_workspace_write.network_access=true 로 띄운다. 아니면 T3 셸에서 ./scripts/check.sh"
+fi
+
 # 1) 테스트 (스택 자동 감지 — 맞지 않으면 이 칸을 직접 고친다)
 has_npm_test() {
   [ -f package.json ] && command -v node >/dev/null 2>&1 &&

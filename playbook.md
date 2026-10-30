@@ -5,7 +5,7 @@
 ## 터미널
 | 터미널 | 역할 | 띄우는 법 |
 |---|---|---|
-| T1 메인 Codex | 쓰기 (유일한 작성자) | `codex` |
+| T1 메인 Codex | 쓰기 (유일한 작성자) | `codex -c sandbox_workspace_write.network_access=true` (없으면 Codex 안에서 서버 테스트가 늘 실패) |
 | T2 보조 Codex | 질의 · 리뷰 (읽기 전용) | `codex --sandbox read-only --ask-for-approval never` |
 | T3 왼쪽 | 서버 (탭 닫지 않음, 0.0.0.0) | 프로젝트의 실행 명령 |
 | T3 오른쪽 | 일반 셸 | `./scripts/check.sh` · `./scripts/status.sh` · `git log` · `curl` |
@@ -48,7 +48,8 @@
 ## 사전 체험 때 키트로 확인할 것
 - clone이 되는가(github.com 접속). 안 되면 README의 tar.gz 대안
 - `bash ~/kit/install.sh` → `./scripts/check.sh` → `./scripts/status.sh`가 도는가
-- `codex`를 띄우고 "이어서"만 쳤을 때 status.sh를 실제로 실행하는가. 안 따르면 `!./scripts/status.sh`
+- 메인을 T1 명령으로 띄우고 "이어서"만 쳤을 때 status.sh를 실제로 실행하는가. 안 따르면 `!./scripts/status.sh`
+- 메인에게 `./scripts/check.sh`를 시키면 T3 셸과 같은 결과인가. 다르면 check.sh가 찍는 "환경" 줄을 본다
 - Codex가 git commit을 할 때 승인 요청이 뜨는가. 막히면 커밋은 T3 셸에서 내가 한다
 - `codex --sandbox read-only --ask-for-approval never`가 뜨고, 쓰기를 시키면 승인을 묻지 않고 못 한다고 하는가
 
