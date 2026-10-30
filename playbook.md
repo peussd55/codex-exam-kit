@@ -5,7 +5,7 @@
 ## 터미널 (모두 작업 폴더에서 띄운다 — 예: `cd ~/uploads`)
 | 터미널 | 역할 | 띄우는 법 |
 |---|---|---|
-| T1 메인 Codex | 쓰기 (유일한 작성자) | `codex -c sandbox_workspace_write.network_access=true` (없으면 Codex 안에서 서버 테스트가 늘 실패) |
+| T1 메인 Codex | 쓰기 (유일한 작성자) | `codex` (플랫폼 기본값 그대로 — 샌드박스 설정을 바꾸지 않는다) |
 | T2 보조 Codex | 질의 · 리뷰 (읽기 전용) | `codex --sandbox read-only --ask-for-approval never` |
 | T3 왼쪽 | 서버 (탭 닫지 않음, 0.0.0.0) | 프로젝트의 실행 명령 |
 | T3 오른쪽 | 일반 셸 | `./scripts/check.sh` · `./scripts/status.sh` · `git log` · `curl` |
@@ -50,8 +50,8 @@
 2. 작업 폴더 = 과제 README가 정한 곳, 없으면 Codex `/status`의 Directory(체험 땐 `~/uploads`)
 3. `git clone -b exam-1031 https://github.com/<계정>/codex-exam-kit /tmp/kit` — 작업 저장소 바깥. 막히면 README의 tar.gz 대안
 4. `cd <작업 폴더> && bash /tmp/kit/install.sh` → `./scripts/check.sh` → `git status -s -uall .`에 키트 파일만 보이면 `git add . && git commit -m "chore: 작업 키트 추가" && git tag r0`
-5. 메인을 T1 명령으로 띄우고 `/status`의 Agents.md에 `~/.codex/AGENTS.md`와 작업 폴더 AGENTS.md가 **둘 다** 보이는가 → "이어서"에 status.sh를 실행하는가(안 따르면 `!./scripts/status.sh`)
-6. 메인이 돌린 check가 T3 셸과 같은가(다르면 "환경" 줄). Codex 커밋에 승인 창이 뜨는가(막히면 T3에서 내가 커밋)
+5. 메인(`codex`)을 띄우고 `/status`의 Agents.md에 `~/.codex/AGENTS.md`와 작업 폴더 AGENTS.md가 **둘 다** 보이는가 → "이어서"에 status.sh를 실행하는가(안 따르면 `!./scripts/status.sh`)
+6. 메인이 돌린 check에 "환경" 줄이 찍히면 샌드박스가 포트를 막은 것 → check는 T3에서 내가 돌리거나 Codex의 샌드박스 밖 실행 요청을 승인. Codex 커밋에 승인 창이 뜨는가(막히면 T3에서 내가 커밋)
 
 ## 하지 않는 것
 - `/init` — AGENTS.md를 새로 만들어 키트 규칙을 덮을 수 있다

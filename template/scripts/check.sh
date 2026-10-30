@@ -45,7 +45,7 @@ port_blocked() {
 }
 if port_blocked; then
   echo "── 환경: 127.0.0.1 포트를 열 수 없음(Codex 샌드박스 네트워크 차단). 서버를 띄우는 테스트는 코드와 무관하게 실패한다 — 코드를 고치지 말고 보고할 것."
-  echo "   메인 Codex는 codex -c sandbox_workspace_write.network_access=true 로 띄운다. 아니면 T3 셸에서 ./scripts/check.sh"
+  echo "   check는 T3 셸에서 사람이 ./scripts/check.sh로 돌리거나, 샌드박스 밖 실행을 요청해 승인을 받는다."
 fi
 
 # 1) 테스트 (스택 자동 감지 — 맞지 않으면 이 칸을 직접 고친다)

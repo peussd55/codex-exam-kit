@@ -96,4 +96,4 @@ fi
 if [ -z "$(git -C "$DEST" config user.name 2>/dev/null)" ]; then
   echo "주의: git user.name이 비어 있어요. 커밋 전에 설정하세요."
 fi
-echo "다음: 메인 Codex를 codex -c sandbox_workspace_write.network_access=true 로 실행하고 README부터 읽게 하세요. 문구 모음 = cat $KIT_DIR/prompts.md · 흐름 = cat $KIT_DIR/playbook.md"
+echo "다음: 작업 폴더에서 메인 Codex(codex)를 실행하고 README부터 읽게 하세요. 문구 모음 = cat $KIT_DIR/prompts.md · 흐름 = cat $KIT_DIR/playbook.md"
