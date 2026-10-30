@@ -6,7 +6,7 @@
 | 터미널 | 역할 | 띄우는 법 |
 |---|---|---|
 | T1 메인 Codex | 쓰기 (유일한 작성자) | `codex` |
-| T2 보조 Codex | 질의 · 리뷰 (읽기 전용) | `codex --sandbox read-only --ask-for-approval on-request` |
+| T2 보조 Codex | 질의 · 리뷰 (읽기 전용) | `codex --sandbox read-only --ask-for-approval never` |
 | T3 왼쪽 | 서버 (탭 닫지 않음, 0.0.0.0) | 프로젝트의 실행 명령 |
 | T3 오른쪽 | 일반 셸 | `./scripts/check.sh` · `./scripts/status.sh` · `git log` · `curl` |
 
@@ -15,7 +15,7 @@
 |---|---|---|---|
 | 0–5분 | — | — | 감독 절차 → 키트 설치 → 첫 커밋 → `git tag r0` (시작 상태) |
 | 5–20분 | 세션1: 요구사항 체크리스트 (prompts 1) | — | README 정독, 담당자 질문 (prompts 7) |
-| 20–35분 | 세션1: /plan → PLAN.md (prompts 2) → 커밋 → `git tag r1` | — | 답 반영, 설계 확인 |
+| 20–35분 | 세션1: PLAN.md 설계 (prompts 2) → 커밋 → `git tag r1` | — | 답 반영, 설계 확인 |
 | 35–40분 | 대기 | **리뷰①** 계획 리뷰 (prompts 5) | 반영·거절 → Decision Log |
 | 40–125분 | 세션2: 모듈마다 구현 (prompts 3) → check PASS → 커밋 | 질의, 위험 모듈만 리뷰 | 브라우저 확인, 리뷰 걸러 전달 |
 | 90분 | — | — | **점검**: 핵심 흐름이 끝에서 끝까지 도나? 아니면 범위를 줄이고 다른 일을 막는 것부터 |
@@ -38,22 +38,24 @@
 | Esc 두 번 (빈 입력창) | 직전 메시지 고치기 | 브라우저 전체화면이 풀릴 수 있음 |
 | Enter (작업 중) | 지금 턴에 지시 끼워 넣기 | |
 | Tab (작업 중) | 다음 턴에 예약 | |
-| Shift+Tab | 계획 모드 | 버전에 따라 다름 — 체험 때 확인 |
+| Shift+Tab | 계획 모드 켜기·끄기 | 쓰지 않는다. 실수로 켰으면 Esc → Shift+Tab (`… for Default mode`가 뜨면 일반 모드) |
 | Ctrl+W · F5 | 탭 닫힘 · 새로고침 | 쓰지 않는다 |
 
 ## 명령
-`/status` 남은 컨텍스트 · `/model` 모델·추론 수준 · `/permissions` 권한 · `/plan` 계획 모드 · `/new` 새 세션 · `/review` 리뷰 · `/side` 곁가지 질문 · `!명령` 셸.
-버전마다 다를 수 있다(`/plan` · `/side`는 특히 확인 필요). 처음에 `/` 목록을 본다. Codex 업데이트 권유가 떠도 업데이트하지 않는다.
+`/status` 남은 컨텍스트 · `/model` 모델·추론 수준 · `/permissions` 권한 · `/new` 새 세션 · `/review` 리뷰 · `/side` 곁가지 질문 · `!명령` 셸.
+버전마다 다를 수 있다(`/side`는 특히 확인 필요). 처음에 `/` 목록을 본다. Codex 업데이트 권유가 떠도 업데이트하지 않는다.
 
 ## 사전 체험 때 키트로 확인할 것
 - clone이 되는가(github.com 접속). 안 되면 README의 tar.gz 대안
 - `bash ~/kit/install.sh` → `./scripts/check.sh` → `./scripts/status.sh`가 도는가
 - `codex`를 띄우고 "이어서"만 쳤을 때 status.sh를 실제로 실행하는가. 안 따르면 `!./scripts/status.sh`
 - Codex가 git commit을 할 때 승인 요청이 뜨는가. 막히면 커밋은 T3 셸에서 내가 한다
-- `codex --sandbox read-only --ask-for-approval on-request`가 뜨는가
+- `codex --sandbox read-only --ask-for-approval never`가 뜨고, 쓰기를 시키면 승인을 묻지 않고 못 한다고 하는가
 
 ## 하지 않는 것
 - `/init` — AGENTS.md를 새로 만들어 키트 규칙을 덮을 수 있다
+- `/plan`(계획 모드) — 끝 화면 "Implement this plan?"에서 Enter = 바로 전부 구현. 계획은 일반 모드에서 PLAN.md에 쓴다(prompts 2)
+- `/new`에서 "Create new Git worktree" — 다른 폴더로 갈라진다. 1번 current worktree를 고른다
 - `git remote add`, push, 기존 `.git` 삭제·재초기화, rebase·amend·reset --hard
 - 결과물을 외부 자료로 통째로 바꾸기
 - 테스트를 지우거나 기대값을 바꿔서 통과시키기 (필요하면 이유를 남기고 따로 커밋)
