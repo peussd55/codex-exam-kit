@@ -15,11 +15,11 @@
 |---|---|---|---|
 | 0–5분 | — | — | 감독 절차 → 시작 직후 확인(아래) → 키트 설치 → 첫 커밋(`git add .`) → `git tag r0` (시작 상태) |
 | 5–20분 | 세션1: 요구사항 체크리스트 (prompts 1) | — | README 정독, 담당자 질문 (prompts 7) |
-| 20–35분 | 세션1: PLAN.md 설계 (prompts 2) → 커밋 → `git tag r1` | — | 답 반영, 설계 확인 |
+| 20–35분 | 세션1: PLAN.md 설계 (prompts 2) → 정리 | — | 답 반영, 설계 확인 → 커밋 확인 후 T3 `git tag r1` |
 | 35–40분 | 대기 | **리뷰①** 계획 리뷰 (prompts 5) | 반영·거절 → Decision Log |
-| 40–125분 | 세션2: 모듈마다 구현 (prompts 3) → check PASS → 커밋 | 질의, 위험 모듈만 리뷰 | 브라우저 확인, 리뷰 걸러 전달 |
+| 40–125분 | 세션2(`/new` → `이어서`): 모듈마다 구현 (prompts 3) → check PASS → 커밋 | 질의, 위험 모듈만 리뷰 | 브라우저 확인, 리뷰 걸러 전달 |
 | 90분 | — | — | **점검**: 핵심 흐름이 끝에서 끝까지 도나? 아니면 범위를 줄이고 다른 일을 막는 것부터 |
-| 125–135분 | `git tag r2`, 대기 | **리뷰②** `리뷰 r1..r2` | 반영할 것 고르기 |
+| 125–135분 | 대기 | **리뷰②** `리뷰 r1..r2` | T3 `git tag r2` → 반영할 것 고르기 |
 | 135–160분 | 세션3(`/new` → `이어서`): 통합 검증·수정 | — | 브라우저로 직접 검증 |
 | 160–170분 | 제출 준비 (prompts 9) → 정리 → 마지막 커밋 | — | PLAN.md 6·8·9절 읽기 (서술형 대비) |
 | 170분 | — | — | 제출 |
@@ -51,7 +51,7 @@
 3. `git clone -b exam-1031 https://github.com/<계정>/codex-exam-kit /tmp/kit` — 작업 저장소 바깥. 막히면 README의 tar.gz 대안
 4. `cd <작업 폴더> && bash /tmp/kit/install.sh` → `./scripts/check.sh` → `git status -s -uall .`에 키트 파일만 보이면 `git add . && git commit -m "chore: 작업 키트 추가" && git tag r0`
 5. 메인(`codex`)을 띄우고 `/status`의 Agents.md에 `~/.codex/AGENTS.md`와 작업 폴더 AGENTS.md가 **둘 다** 보이는가 → "이어서"에 status.sh를 실행하는가(안 따르면 `!./scripts/status.sh`)
-6. 메인이 돌린 check에 "환경" 줄이 찍히면 샌드박스가 포트를 막은 것 → check는 T3에서 내가 돌리거나 Codex의 샌드박스 밖 실행 요청을 승인. Codex 커밋에 승인 창이 뜨는가(막히면 T3에서 내가 커밋)
+6. 메인이 돌린 check에 "환경" 줄이 찍히면 샌드박스가 포트를 막은 것 → check는 T3에서 내가 돌리거나 Codex의 샌드박스 밖 실행 요청을 승인. Codex 커밋에 승인 창이 뜨는가(막히면 T3에서 내가 `git add . && git commit -m "<타입>: <무엇을>"`)
 
 ## 하지 않는 것
 - `/init` — AGENTS.md를 새로 만들어 키트 규칙을 덮을 수 있다
