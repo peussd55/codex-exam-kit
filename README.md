@@ -1,53 +1,56 @@
 # codex-exam-kit
 
 시간제한이 있는 1인 AI 코딩 과제(OpenAI Codex CLI 사용)를 위한 개인 작업 키트입니다.
-2026년 AI 해커톤 2차 예선 응시를 앞두고, 그동안 AI 코딩 에이전트와 일하며 효과를 본 작업 방식을 범용 틀로 정리했습니다.
+2026년 AI 해커톤 2차 예선 응시를 위해, AI 코딩 에이전트와 일하며 효과를 본 작업 방식을 범용 틀로 정리했습니다.
 
 - 특정 과제의 문제나 풀이는 들어 있지 않습니다. 과제 내용은 시험 전에 알 수 없습니다.
-- 들어 있는 것은 작업 규칙, 계획 문서 뼈대, 검사 스크립트, 요청 문구입니다.
-- 결과물 코드를 대신 만들어 주는 것은 없습니다.
+- 들어 있는 것은 작업 규칙과 약속어, 계획 문서 뼈대, 과제와 무관한 검사 스크립트, 사람이 쓰는 문구입니다.
+- 결과물 코드를 대신 만들어 주는 것은 없습니다. 과제별 검사(제약 검증기 등)도 현장의 Codex가 과제를 읽고 `scripts/verify.sh`로 만듭니다.
+- 10/31 응시에서 겪은 진행 형식(업무 담당자와의 대화 · 제출 뒤 서술형)을 반영했고, 과제 내용·풀이는 담지 않습니다.
+
+## 생각
+
+- **사람은 PM, Codex는 개발팀.** 사람은 판단·업무 담당자와의 대화·이해를 맡고, 파일·git·명령은 Codex가 맡습니다. 사람이 치는 것은 약속어 한 단어(`시작` · `담당자 답:` · `설계` · `구현` …)와, 갈림길에서는 이유 한 줄입니다.
+- **정답은 대화로 정해진다.** README에 없는 결정은 혼자 정하지 않고 담당자에게 묻습니다. 데이터에서 본 쏠림·예외를 근거로 고민을 캐고, 수치를 확정하고, 설계를 역제안하고, 결과 숫자로 중간 보고합니다. 주고받은 말은 원문 그대로 남기고, 끝내 안 정해지는 값은 옵션으로 둡니다.
+- **기록은 PLAN.md 한 곳.** 현재 상태는 최신으로 고치고, 이력(Progress·Decision Log·발견·담당자 기록·설명 노트)은 덧붙이기만 합니다. 다른 곳에서는 번호(R1·Q1·D-1)로만 가리킵니다.
+- **계층을 나눈다.** 입력·HTTP → 산출 로직(순수 함수) → 저장 → 화면. 산출 로직은 HTTP·DB를 모르게 두고, 테스트는 포트를 열지 않습니다.
+- **다음 단계 판정은 테스트.** `./scripts/check.sh`가 CHECK PASS여야 넘어갑니다. 과제와 무관한 칸은 키트가 고정하고, 과제별 검사는 과제를 아는 Codex가 `scripts/verify.sh`에 직접 씁니다(하드 제약 위반만 FAIL · 제출 문서 검사는 `SUBMIT=1`일 때만).
+- **이해는 작업 중에.** 메인 Codex가 구현하는 동안 사람은 읽기 전용 보조 Codex에게 설명을 듣고(`설명`) 스스로 점검합니다(`이해 확인` — 답을 먼저 알려 주지 않음). 결과물을 설명할 수 있어야 끝난 것입니다.
+- **규칙은 짧게.** AGENTS.md는 매 턴 읽히므로, 규칙을 하나 더하면 하나를 덜어냅니다.
 
 ## 구성
 
 | 경로 | 내용 | 작업 폴더로 복사 |
 |---|---|---|
-| `template/AGENTS.md` | Codex 작업 규칙과 약속어(이어서 · 정리 · 리뷰) | 예 |
-| `template/PLAN.md` | 계획 문서 뼈대: 목표·범위 밖·완료 조건 / 요구사항(출처 태그) / 설계 / 용어집 / Progress / Decision Log / 발견 / 알려진 약점 / Outcomes | 예 |
-| `template/scripts/check.sh` | 완료 조건 검사: 테스트 자동 감지, 선택 스모크, 비밀값·줄바꿈 위생 | 예 |
-| `template/scripts/status.sh` | 세션 시작 요약: PLAN ▶ 줄, 요구사항 진척, 마지막 결정, 최근 발견, git 상태, 마지막 check | 예 |
+| `template/AGENTS.md` | Codex 작업 규칙(지켜야 할 선 · 기록 · 범위 · 코드 · 검증 · 커밋)과 약속어 12개 | 예 |
+| `template/PLAN.md` | 계획 문서 뼈대: 목표·제출물·데이터 요약 / 요구사항 / 설계(계층 지도·구현 순서·검사 계획·옵션) / 용어집 / Progress / Decision Log / 발견 / 알려진 약점 / Outcomes(한 장 요약) / 담당자 기록 / 설명 노트 | 예 |
+| `template/scripts/check.sh` | 완료 조건 검사: 테스트 자동 감지 · 과제 검사(`scripts/verify.sh`) 호출 · 비밀값·커밋 대상·줄바꿈 위생 · 샌드박스 포트 차단 안내 | 예 |
+| `template/scripts/status.sh` | 세션 시작 요약: PLAN ▶ 줄, 요구사항·담당자 진척, 마지막 결정, 최근 발견, git 상태, 마지막 check, r0부터 경과 시간 | 예 |
 | `template/.gitignore` | 의존성·빌드·비밀 파일 제외 | 예 |
-| `install.sh` | template/을 현재 폴더에 복사(있는 파일은 덮어쓰지 않음) | — |
-| `prompts.md` | 단계별 요청 문구 | 아니오 (키트 폴더에서 `cat`) |
-| `playbook.md` | 180분 흐름과 규칙 한 장 | 아니오 |
+| `install.sh` | template/을 현재 폴더에 복사(있는 파일은 덮어쓰지 않음 · 다시 실행해도 됨). 작업 폴더가 홈이면 홈의 숨김 파일·폴더를 git에서 제외. 사람용 문서를 `.kit/`에 복사 | — |
+| `playbook.md` | 180분 흐름 · 창 · 승인 창 · FAIL·끊김 대응 · 말 뜻 한 장 | `.kit/`에 (에디터로 열어 둠) |
+| `prompts.md` | 상황별 문구와 사람이 쓰는 틀(담당자 대화 · 소감 문서 · 서술형 · 범위 줄이기 · 통합 확인) | `.kit/`에 |
 
 ## 사용
 
 ```bash
-git clone -b exam-1031 https://github.com/<계정>/codex-exam-kit /tmp/kit
-cd <작업 폴더>                 # 예: ~/uploads (Codex /status의 Directory)
+git clone -b exam-retake https://github.com/<계정>/codex-exam-kit /tmp/kit
+cd <작업 폴더>                 # 과제 README가 있는 폴더 (본시험은 홈 /home/user)
 bash /tmp/kit/install.sh
-git status -s -uall .          # 키트 파일만 보이는지 확인
-git add . && git commit -m "chore: 작업 키트 추가" && git tag r0
+codex                          # 메인 Codex → "시작"
 ```
 
-- 태그: 시험에 쓰는 판은 `exam-1031` 태그로 고정합니다. 이후 이 태그는 옮기지 않습니다.
-- 키트는 작업 **저장소 바깥**(`/tmp/kit`)에 받고 필요한 파일만 복사합니다. 제출물에 키트 저장소가 섞이지 않게 하려는 것입니다. 홈 자체가 저장소인 환경에서는 `~/kit`도 저장소 안이므로, install.sh는 키트가 작업 저장소 안에 있으면 설치를 거부합니다.
-- 스테이징은 작업 폴더 안만(`git add .`). 저장소 루트가 홈이면 `git add -A`가 `~/.codex`(로그인 정보) 같은 홈 파일까지 담습니다.
+- 과제 원본·키트 커밋과 시작 태그(r0)는 메인 Codex가 "시작"에서 파일 경로를 지정해 합니다. 사람이 git을 칠 필요가 없습니다. `.git`은 샌드박스에서 읽기 전용이라 Codex가 처음부터 샌드박스 밖 실행 승인을 요청합니다.
+- 승인 창에서는 명령을 읽고 `Yes, just this once`(이번만)만 고릅니다. `don't ask again …` · `allow … in the future` · `full access`는 `~/.codex`에 규칙을 저장하거나 샌드박스를 풀기 때문에 고르지 않습니다.
+- 태그: 시험에 쓰는 판은 태그로 고정합니다(10/31판 = `exam-1031`, 재응시판 = `exam-retake`). 시험이 시작되면 태그를 옮기지 않습니다.
+- 키트는 작업 **저장소 바깥**(`/tmp/kit`)에 받고 필요한 파일만 복사합니다. 홈 자체가 저장소인 환경에서는 `~/kit`도 저장소 안이므로, install.sh는 키트가 작업 저장소 안에 있으면 설치를 거부합니다.
+- 스테이징은 바꾼 파일 경로만. 저장소 루트가 홈이면 `git add .`·`git add -A`가 `~/.codex`(로그인 정보)까지 담습니다. 작업 폴더가 홈이면 install.sh가 `.gitignore`에 홈의 숨김 파일·폴더 제외 줄(`/.*`, `.gitignore`·`.env.example`은 살림)을 덧붙이고, check.sh가 커밋 대상에 홈 설정·`.env`·의존성이 섞였는지 검사합니다.
 - git clone이 막히면 압축 파일로 받습니다:
-  `mkdir -p /tmp/kit && curl -fsSL https://github.com/<계정>/codex-exam-kit/archive/refs/tags/exam-1031.tar.gz | tar xz -C /tmp/kit --strip-components=1`
+  `mkdir -p /tmp/kit && curl -fsSL https://github.com/<계정>/codex-exam-kit/archive/refs/tags/exam-retake.tar.gz | tar xz -C /tmp/kit --strip-components=1`
 - `install.sh`는 없는 파일만 복사합니다. 이미 있는 AGENTS.md에는 키트 규칙을 구분선 아래에 덧붙이고(과제 지침이 우선), 이미 있는 .gitignore에는 빠진 줄만 덧붙입니다. 그 밖의 기존 파일은 건드리지 않습니다. git 커밋, 원격 저장소, Codex 설정(`~/.codex`)도 건드리지 않습니다.
-
-## 작업 방식 요약
-
-- **기록은 PLAN.md 한 곳**: 현재 상태(▶ 줄·요구사항·설계)는 최신으로 고치고, 이력(Progress·Decision Log·발견)은 덧붙이기만 합니다. 다른 곳에서는 R1·D-1 같은 번호로만 가리키고 다시 풀어 쓰지 않습니다. 세션이 바뀔 때마다 다른 말로 옮겨 적으면 뜻이 조금씩 흘러가기 때문입니다.
-- **발견은 따로**: 환경의 함정과 실패한 시도는 발견 절에 근거와 함께 모읍니다. 새 세션이 `status.sh`로 바로 보고 같은 실수를 하지 않습니다.
-- **쓰기는 메인 Codex 하나**: 보조 Codex는 읽기 전용(`--sandbox read-only`)으로 질의와 리뷰만 합니다.
-- **다음 단계 판정은 테스트**: `./scripts/check.sh`가 CHECK PASS여야 넘어갑니다. 리뷰 지적은 사람이 골라 반영하고 이유를 남깁니다.
-- **세션은 작업 덩어리마다**: 끝낼 때 "정리", 새 세션에서 "이어서". 새 세션이 PLAN.md만 보고 이어갈 수 있어야 합니다.
-- **범위 통제**: 요청하지 않은 기능·리팩토링·방어 코드는 만들지 않고, 요구사항에 없는 판단은 [가정]으로 남깁니다.
 
 ## 참고한 공개 자료
 
-- OpenAI Codex 문서: AGENTS.md, 승인·샌드박스, 모범 사례, ExecPlan
+- OpenAI Codex 문서: AGENTS.md, 승인·샌드박스, 규칙(rules), 모범 사례, ExecPlan
 - Anthropic 엔지니어링 블로그: 장시간 에이전트 하네스, 하네스 설계
 - Cognition 블로그: 멀티에이전트 작업 방식

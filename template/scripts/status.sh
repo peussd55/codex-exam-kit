@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 # 세션 시작 요약 — "이어서" 때 실행한다. 아무것도 고치지 않고 읽기만 한다.
-# PLAN.md의 ▶ 줄, 요구사항 진척, 마지막 결정 번호, 최근 발견, 알려진 약점 수, git 상태, 마지막 check 결과를 한 화면에 보여 준다.
+# PLAN.md의 ▶ 줄, 요구사항 진척, 담당자 기록, 마지막 결정 번호, 최근 발견, 알려진 약점 수, git 상태, 마지막 check, r0부터 경과 시간을 한 화면에 보여 준다.
 cd "$(dirname "$0")/.." || exit 1
 
 REQ='^[-*] \[[ xX]\] \**R-?[0-9]+'
 count() { [ -f PLAN.md ] || { echo 0; return; }; grep -cE "$1" PLAN.md 2>/dev/null; true; }
 section() { [ -f PLAN.md ] && awk -v h="^## $1\\\\." '$0 ~ h {f=1; next} /^## /{f=0} f && /^[-*] /' PLAN.md; }
+# 10절(담당자 기록): Q 항목 수 / 마지막 Q 항목의 "되물을 것" (서식 주석 줄은 건너뜀)
+owner_count() { [ -f PLAN.md ] && awk '/^## 10\./{f=1; next} /^## /{f=0} f && /^[-*] \**Q[0-9]+/{n++} END{print n+0}' PLAN.md || echo 0; }
+owner_open() { [ -f PLAN.md ] && awk '/^## 10\./{f=1; next} /^## /{f=0} !f || /^<!--/ {next} /^[-*] \**Q[0-9]+/{o=""} /되물을 것:/{s=$0; sub(/.*되물을 것: */, "", s); o=s} END{print o}' PLAN.md; }
 
 echo "== PLAN ▶"
 if [ -f PLAN.md ]; then
@@ -17,11 +20,16 @@ fi
 req_total=$(count "$REQ")
 req_done=$(count '^[-*] \[[xX]\] \**R-?[0-9]+')
 assumed=$(count "${REQ}.*\\[가정")
-last_dec=$( [ -f PLAN.md ] && grep -oE '^[-*] D-[0-9]+' PLAN.md | tail -1 | sed 's/^[-*] //' )
+last_dec=$( [ -f PLAN.md ] && grep -oE '^[-*] \**D-[0-9]+' PLAN.md | tail -1 | sed 's/^[-*] \**//' )
 weak=$(section 8 | grep -vc '<약점>')
+q_total=$(owner_count)
+q_open=$(owner_open)
 
 echo "== 진척"
 echo "  요구사항 ${req_done}/${req_total} 완료 · [가정] ${assumed}개 · 마지막 결정 ${last_dec:-없음} · 알려진 약점 ${weak:-0}개"
+echo "  담당자 기록 Q ${q_total:-0}개 · 마지막 되물을 것: ${q_open:-없음}"
+t0=$(git log -1 --format=%ct r0 2>/dev/null)
+if [ -n "$t0" ]; then echo "  경과: r0부터 $(( ($(date +%s) - t0) / 60 ))분 (시험 180분)"; fi
 
 echo "== 발견 (최근 5줄 — 같은 실수를 반복하지 않기 위해)"
 found=$(section 7 | tail -5)
