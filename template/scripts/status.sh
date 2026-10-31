@@ -9,6 +9,15 @@ section() { [ -f PLAN.md ] && awk -v h="^## $1\\\\." '$0 ~ h {f=1; next} /^## /{
 # 10절(담당자 기록): Q 항목 수 / 마지막 Q 항목의 "되물을 것" (서식 주석 줄은 건너뜀)
 owner_count() { [ -f PLAN.md ] && awk '/^## 10\./{f=1; next} /^## /{f=0} f && /^[-*] \**Q[0-9]+/{n++} END{print n+0}' PLAN.md || echo 0; }
 owner_open() { [ -f PLAN.md ] && awk '/^## 10\./{f=1; next} /^## /{f=0} !f || /^<!--/ {next} /^[-*] \**Q[0-9]+/{o=""} /되물을 것:/{s=$0; sub(/.*되물을 것: */, "", s); o=s} END{print o}' PLAN.md; }
+# 10절에 아직 없는 2차 범주: Q 항목의 첫 [ ] 태그에 범주 이름이 있는지로 본다
+owner_missing() {
+  local tags="" out="" c
+  [ -f PLAN.md ] && tags=$(awk '/^## 10\./{f=1; next} /^## /{f=0} f && /^[-*] \**Q[0-9]+/' PLAN.md | sed -n 's/^[^[]*\(\[[^]]*\]\).*/\1/p')
+  for c in "데이터" "기간 예외" "이어질 때" "묶기" "따로 다룰 대상" "못 할 때"; do
+    printf '%s\n' "$tags" | grep -qF -- "$c" || out="${out:+$out · }$c"
+  done
+  printf '%s' "$out"
+}
 
 echo "== PLAN ▶"
 if [ -f PLAN.md ]; then
@@ -24,10 +33,12 @@ last_dec=$( [ -f PLAN.md ] && grep -oE '^[-*] \**D-[0-9]+' PLAN.md | tail -1 | s
 weak=$(section 8 | grep -vc '<약점>')
 q_total=$(owner_count)
 q_open=$(owner_open)
+q_miss=$(owner_missing)
 
 echo "== 진척"
 echo "  요구사항 ${req_done}/${req_total} 완료 · [가정] ${assumed}개 · 마지막 결정 ${last_dec:-없음} · 알려진 약점 ${weak:-0}개"
 echo "  담당자 기록 Q ${q_total:-0}개 · 마지막 되물을 것: ${q_open:-없음}"
+echo "  안 물은 2차 범주: ${q_miss:-없음}"
 t0=$(git log -1 --format=%ct r0 2>/dev/null)
 if [ -n "$t0" ]; then echo "  경과: r0부터 $(( ($(date +%s) - t0) / 60 ))분 (시험 180분)"; fi
 
