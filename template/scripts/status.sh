@@ -10,9 +10,11 @@ section() { [ -f PLAN.md ] && awk -v h="^## $1\\\\." '$0 ~ h {f=1; next} /^## /{
 owner_count() { [ -f PLAN.md ] && awk '/^## 10\./{f=1; next} /^## /{f=0} f && /^[-*] \**Q[0-9]+/{n++} END{print n+0}' PLAN.md || echo 0; }
 owner_open() { [ -f PLAN.md ] && awk '/^## 10\./{f=1; next} /^## /{f=0} !f || /^<!--/ {next} /^[-*] \**Q[0-9]+/{o=""} /되물을 것:/{s=$0; sub(/.*되물을 것: */, "", s); o=s} END{print o}' PLAN.md; }
 # 10절에 아직 없는 2차 범주: Q 항목의 첫 [ ] 태그에 범주 이름이 있는지로 본다
+#  - 되물음 태그는 범주로 치지 않는다(되물음이 범주를 "채우면" 그 장면은 끝내 안 묻게 된다 — live-v22)
+#  - "값"은 [가정]이 있을 때 묻는 범주라 세지 않는다
 owner_missing() {
   local tags="" out="" c
-  [ -f PLAN.md ] && tags=$(awk '/^## 10\./{f=1; next} /^## /{f=0} f && /^[-*] \**Q[0-9]+/' PLAN.md | sed -n 's/^[^[]*\(\[[^]]*\]\).*/\1/p')
+  [ -f PLAN.md ] && tags=$(awk '/^## 10\./{f=1; next} /^## /{f=0} f && /^[-*] \**Q[0-9]+/' PLAN.md | sed -n 's/^[^[]*\(\[[^]]*\]\).*/\1/p' | grep -v '되물음')
   for c in "데이터" "기간 예외" "이어질 때" "묶기" "따로 다룰 대상" "못 할 때"; do
     printf '%s\n' "$tags" | grep -qF -- "$c" || out="${out:+$out · }$c"
   done
